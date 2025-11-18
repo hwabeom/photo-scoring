@@ -141,7 +141,7 @@ nextBtn.addEventListener("click", () => {
   }
 
   if (Object.keys(scores).length !== photos.length) {
-    alert("아직 입력하지 않은 사진의 점수가 있습니다!");
+    alert("아직 점수를 입력하지 않은 사진이 있습니다!");
     return;
   }
 
@@ -170,12 +170,11 @@ prevBtn.addEventListener("click", () => {
 
 // -------------------- 점수 입력 처리 --------------------
 
-// scoreInput 입력 (직접 입력 / 붙여넣기)
 scoreInput.addEventListener("input", () => {
   let val = scoreInput.value;
 
-  val = val.replace(/\D/g, ""); // 숫자만 남기기
-  if (val.length > 2) val = val.slice(0, 2); // 최대 두 자리
+  val = val.replace(/\D/g, "");
+  if (val.length > 2) val = val.slice(0, 2);
 
   let num = Number(val);
   if (isNaN(num) || num < 1) num = 1;
@@ -185,7 +184,6 @@ scoreInput.addEventListener("input", () => {
   scoreRange.value = num;
 });
 
-// blur 이벤트 (입력 완료 후 범위 강제)
 scoreInput.addEventListener("blur", () => {
   let num = Number(scoreInput.value);
   if (isNaN(num) || num < 1) num = 1;
@@ -194,7 +192,6 @@ scoreInput.addEventListener("blur", () => {
   scoreRange.value = num;
 });
 
-// scoreRange → scoreInput 동기화
 scoreRange.addEventListener("input", (e) => {
   scoreInput.value = e.target.value;
 });
