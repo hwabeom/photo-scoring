@@ -1,69 +1,108 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>국립한밭대학교 캠퍼스 사진 공모전 점수 매기기</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="container">
-  <header>
-    <h1>국립한밭대학교 캠퍼스 사진 공모전 점수 매기기</h1>
-    <p class="subtitle">폴더 선택 후 사진을 보고 점수를 입력하세요. 모든 사진에 점수를 입력하면 CSV 다운로드가 활성화됩니다.</p>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>국립한밭대학교 캠퍼스 사진 공모전 점수 매기기</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>국립한밭대학교 캠퍼스 사진 공모전 점수 매기기</h1>
+        <p class="subtitle">
+          폴더 선택 후 사진을 보고 점수를 입력하세요. 모든 사진에 점수를
+          입력하면 CSV 다운로드가 활성화됩니다.
+        </p>
+      </header>
 
-  <section class="uploader">
-    <label class="file-btn">
-      <input id="folderInput" type="file" webkitdirectory directory multiple accept="image/*">
-      이미지 폴더 선택
-    </label>
-    <div class="meta" id="metaInfo">사진을 선택하세요.</div>
-  </section>
+      <section class="uploader">
+        <label class="file-btn">
+          <input
+            id="folderInput"
+            type="file"
+            webkitdirectory
+            directory
+            multiple
+            accept="image/*"
+          />
+          이미지 폴더 선택
+        </label>
+        <div class="meta" id="metaInfo">사진을 선택하세요.</div>
+      </section>
 
-  <main id="viewer" class="viewer hidden" aria-live="polite">
-    <div class="card">
-      <div class="photo-area">
-        <img id="photoDisplay" alt="선택된 사진">
-      </div>
-      <div class="info">
-        <h2 id="photoName" class="photo-name"></h2>
-        <div class="progress"><span id="progressText"></span></div>
+      <main id="viewer" class="viewer hidden" aria-live="polite">
+        <div class="card">
+          <div class="photo-area">
+            <img id="photoDisplay" alt="선택된 사진" />
+          </div>
+          <div class="info">
+            <h2 id="photoName" class="photo-name"></h2>
+            <div class="progress"><span id="progressText"></span></div>
 
-        <div class="score-row">
-          <label for="scoreInput">점수</label>
-          <input id="scoreInput" type="number" min="0" max="100" step="1" placeholder="예: 1~10">
-          <input id="scoreRange" type="range" min="0" max="100" step="1">
+            <div class="score-row">
+              <label for="scoreInput">점수</label>
+              <input
+                id="scoreInput"
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                placeholder="예: 1~10"
+              />
+              <input id="scoreRange" type="range" min="0" max="100" step="1" />
+            </div>
+
+            <div class="controls">
+              <button id="prevBtn" class="btn">이전</button>
+              <button id="nextBtn" class="btn primary">다음</button>
+              <button id="jumpBtn" class="btn">목록 보기</button>
+            </div>
+          </div>
         </div>
+      </main>
 
-        <div class="controls">
-          <button id="prevBtn" class="btn">이전</button>
-          <button id="nextBtn" class="btn primary">다음</button>
-          <button id="jumpBtn" class="btn">목록 보기</button>
+      <section class="bottom">
+        <button id="downloadBtn" class="btn download" disabled>
+          CSV 다운로드
+        </button>
+        <div class="note">
+          모든 점수 입력이 완료될 경우 csv 버튼이 활성화됩니다.
+        </div>
+      </section>
+
+      <footer>
+        <small>© 2025 hwabeom</small>
+      </footer>
+    </div>
+
+    <!-- list modal -->
+    <div id="listModal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <h3>사진 목록 (클릭 시 이동)</h3>
+        <div id="listContainer" class="list"></div>
+        <div class="modal-actions">
+          <button id="closeList" class="btn">닫기</button>
         </div>
       </div>
     </div>
-  </main>
 
-  <section class="bottom">
-    <button id="downloadBtn" class="btn download" disabled>CSV 다운로드</button>
-    <div class="note">모든 점수 입력이 완료될 경우 csv 버튼이 활성화됩니다.</div>
-  </section>
+    <script src="script.js"></script>
 
-  <footer>
-    <small>© 2025 hwabeom</small>
-  </footer>
-</div>
-
-<!-- list modal -->
-<div id="listModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-content">
-    <h3>사진 목록 (클릭 시 이동)</h3>
-    <div id="listContainer" class="list"></div>
-    <div class="modal-actions"><button id="closeList" class="btn">닫기</button></div>
-  </div>
-</div>
-
-<script src="script.js"></script>
-</body>
+    <!-- username modal -->
+    <div id="usernameModal" class="modal" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        <h3>사용자 이름을 입력하세요</h3>
+        <input
+          id="usernameInput"
+          type="text"
+          placeholder="예: 홍길동"
+          class="username-field"
+        />
+        <div class="modal-actions">
+          <button id="usernameSubmit" class="btn primary">확인</button>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
