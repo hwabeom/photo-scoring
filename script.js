@@ -252,17 +252,3 @@ function downloadCSV() {
   a.click();
   URL.revokeObjectURL(url);
 }
-
-// -------------------- 키보드 입력 --------------------
-document.addEventListener("keydown", (e) => {
-  if (photos.length === 0) return;
-
-  if (e.key === "ArrowLeft") prevBtn.click();
-  else if (e.key === "ArrowRight") nextBtn.click();
-  else if (e.key >= "0" && e.key <= "9") {
-    let val = e.key;
-    if (val === "0") val = "10";
-    scoreInput.value = val;
-    scoreRange.value = val;
-  }
-});
