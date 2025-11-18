@@ -256,7 +256,7 @@ header h1 {
   box-shadow: none;
 }
 .btn.primary {
-  background: linear-gradient(90deg, var(--accent), #8e7bff);
+  background: linear-gradient(90deg, #dfbb66, #da9c6d);
   color: white;
   border: 0;
 }
@@ -284,6 +284,17 @@ footer {
   color: var(--muted);
   font-size: 13px;
   text-align: left;
+}
+
+footer small {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-logo {
+  width: 100px;
+  height: auto;
 }
 
 .modal {
