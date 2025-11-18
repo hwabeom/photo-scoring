@@ -116,17 +116,20 @@ function updateButtons() {
 function saveScore() {
   if (photos.length === 0) return;
   const name = photos[current].name.replace(/\.[^/.]+$/, "");
-  let val = Number(scoreInput.value);
-  if (isNaN(val) || val < 1) val = 1;
-  if (val > 10) val = 10;
+  let val = scoreInput.value.trim();
 
   if (val === "") {
     delete scores[name];
+    scoreRange.value = 1;
   } else {
+    val = Number(val);
+    if (isNaN(val) || val < 1) val = 1;
+    if (val > 10) val = 10;
     scores[name] = val;
+    scoreRange.value = val;
   }
-  scoreInput.value = val;
-  scoreRange.value = val;
+
+  scoreInput.value = val || "";
   buildList();
   checkDone();
 }
