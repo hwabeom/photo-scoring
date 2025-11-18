@@ -1,4 +1,4 @@
-// main logic
+// -------------------- DOM 요소 --------------------
 const folderInput = document.getElementById("folderInput");
 const viewer = document.getElementById("viewer");
 const photoDisplay = document.getElementById("photoDisplay");
@@ -25,6 +25,7 @@ const usernameModal = document.getElementById("usernameModal");
 const usernameInput = document.getElementById("usernameInput");
 const usernameSubmit = document.getElementById("usernameSubmit");
 
+// -------------------- 사용자 이름 입력 모달 --------------------
 window.addEventListener("load", () => {
   if (usernameModal) {
     usernameModal.classList.remove("hidden");
@@ -45,10 +46,12 @@ if (usernameSubmit) {
   });
 }
 
+// -------------------- 이미지 로드 --------------------
 folderInput.addEventListener("change", (e) => {
   photos = Array.from(e.target.files).filter((f) =>
     f.type.startsWith("image/")
   );
+
   photos.sort((a, b) => a.name.localeCompare(b.name, "ko"));
   if (photos.length === 0) {
     metaInfo.textContent = "선택된 이미지가 없습니다.";
@@ -56,12 +59,14 @@ folderInput.addEventListener("change", (e) => {
     if (downloadBtn) downloadBtn.disabled = true;
     return;
   }
+
   metaInfo.textContent = `${photos.length}개의 사진이 로드되었습니다.`;
   viewer.classList.remove("hidden");
   buildList();
   showPhoto(0);
 });
 
+// -------------------- 목록 생성 --------------------
 function buildList() {
   listContainer.innerHTML = "";
   photos.forEach((p, idx) => {
@@ -76,20 +81,25 @@ function buildList() {
   });
 }
 
+// -------------------- 사진 표시 --------------------
 function showPhoto(index) {
   current = index;
   const file = photos[current];
   const name = file.name.replace(/\.[^/.]+$/, "");
   photoName.textContent = name;
   progressText.textContent = `${current + 1} / ${photos.length}`;
+
   const reader = new FileReader();
   reader.onload = (ev) => (photoDisplay.src = ev.target.result);
   reader.readAsDataURL(file);
+
   scoreInput.value = scores[name] ?? "";
   scoreRange.value = scores[name] ?? 1;
+
   updateButtons();
 }
 
+// -------------------- 버튼 설정 --------------------
 function updateButtons() {
   prevBtn.disabled = current === 0;
 
@@ -102,19 +112,26 @@ function updateButtons() {
   }
 }
 
+// -------------------- 점수 저장 --------------------
 function saveScore() {
   if (photos.length === 0) return;
   const name = photos[current].name.replace(/\.[^/.]+$/, "");
-  const val = scoreInput.value;
+  let val = Number(scoreInput.value);
+  if (isNaN(val) || val < 1) val = 1;
+  if (val > 10) val = 10;
+
   if (val === "") {
     delete scores[name];
   } else {
     scores[name] = val;
   }
+  scoreInput.value = val;
+  scoreRange.value = val;
   buildList();
   checkDone();
 }
 
+// -------------------- 사진 이동 버튼 --------------------
 nextBtn.addEventListener("click", () => {
   saveScore();
 
@@ -151,29 +168,49 @@ prevBtn.addEventListener("click", () => {
   if (current > 0) showPhoto(current - 1);
 });
 
-scoreInput.addEventListener("input", (e) => {
-  const v = e.target.value;
-  if (v !== "" && !isNaN(v)) {
-    // clamp to 1..10 if desired
-    let num = Number(v);
-    if (num < Number(scoreInput.min || 1)) num = Number(scoreInput.min || 1);
-    if (scoreInput.max && num > Number(scoreInput.max))
-      num = Number(scoreInput.max);
-    scoreRange.value = num;
-  }
+// -------------------- 점수 입력 처리 --------------------
+
+// scoreInput 입력 (직접 입력 / 붙여넣기)
+scoreInput.addEventListener("input", () => {
+  let val = scoreInput.value;
+
+  val = val.replace(/\D/g, ""); // 숫자만 남기기
+  if (val.length > 2) val = val.slice(0, 2); // 최대 두 자리
+
+  let num = Number(val);
+  if (isNaN(num) || num < 1) num = 1;
+  if (num > 10) num = 10;
+
+  scoreInput.value = num;
+  scoreRange.value = num;
 });
 
+// blur 이벤트 (입력 완료 후 범위 강제)
+scoreInput.addEventListener("blur", () => {
+  let num = Number(scoreInput.value);
+  if (isNaN(num) || num < 1) num = 1;
+  if (num > 10) num = 10;
+  scoreInput.value = num;
+  scoreRange.value = num;
+});
+
+// scoreRange → scoreInput 동기화
 scoreRange.addEventListener("input", (e) => {
   scoreInput.value = e.target.value;
 });
 
+// -------------------- 목록 모달 --------------------
 jumpBtn.addEventListener("click", () => {
   if (listModal) listModal.classList.remove("hidden");
 });
 
-closeList &&
-  closeList.addEventListener("click", () => listModal.classList.add("hidden"));
+if (closeList) {
+  closeList.addEventListener("click", () => {
+    listModal.classList.add("hidden");
+  });
+}
 
+// -------------------- 완료 체크 --------------------
 function checkDone() {
   const allScored =
     Object.keys(scores).length === photos.length && photos.length > 0;
@@ -183,6 +220,7 @@ function checkDone() {
   return allScored;
 }
 
+// -------------------- CSV 다운로드 --------------------
 if (downloadBtn) {
   downloadBtn.addEventListener("click", () => {
     saveScore();
@@ -190,27 +228,12 @@ if (downloadBtn) {
       alert("아직 모든 사진의 점수가 입력되지 않았습니다.");
       return;
     }
-
     if (!username) {
       alert("CSV 파일명을 위해 이름을 먼저 입력해주세요.");
       if (usernameModal) usernameModal.classList.remove("hidden");
       return;
     }
-
-    let csv = "\uFEFFphoto,score\r\n";
-    photos.forEach((p) => {
-      const name = p.name.replace(/\.[^/.]+$/, "");
-      const s = scores[name] ?? "";
-      csv += `${name},${s}\r\n`;
-    });
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${username}_점수.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV();
   });
 }
 
@@ -233,14 +256,13 @@ function downloadCSV() {
   URL.revokeObjectURL(url);
 }
 
+// -------------------- 키보드 입력 --------------------
 document.addEventListener("keydown", (e) => {
   if (photos.length === 0) return;
 
-  if (e.key === "ArrowLeft") {
-    prevBtn.click();
-  } else if (e.key === "ArrowRight") {
-    nextBtn.click();
-  } else if (e.key >= "0" && e.key <= "9") {
+  if (e.key === "ArrowLeft") prevBtn.click();
+  else if (e.key === "ArrowRight") nextBtn.click();
+  else if (e.key >= "0" && e.key <= "9") {
     let val = e.key;
     if (val === "0") val = "10";
     scoreInput.value = val;
